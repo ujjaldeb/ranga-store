@@ -9,25 +9,28 @@ const loadProducts = () => {
 
 loadProducts();
 
-// show all product in UI 
+// show all products in UI 
 const showProducts = (products) => {
   const allProducts = products.map((pd) => pd);
 
+  // loop through each product
   for (const product of allProducts) {
     // It will be image in place of images (Fixed)
     const image = product.image;
     const div = document.createElement("div");
     div.classList.add("product");
     div.innerHTML = `<div class="single-product">
-      <div>
-    <img class="product-image" src=${image}></img>
-      </div>
-      <h3>${product.title}</h3>
-      <p>Category: ${product.category}</p>
-      <h2>Price: $ ${product.price}</h2>
-      <button onclick="addToCart(${product.id},${product.price})" id="addToCart-btn" class="buy-now btn btn-success">add to cart</button>
-      <button id="details-btn" class="btn btn-danger">Details</button></div>
-      `;
+    <div>
+      <img class="product-image mb-3" src=${image}></img>
+    </div>
+    <h4>${product.title}</h4>
+    <p>Category: ${product.category}</p>
+    <p>Reactions count: ${product.rating.count}</p>
+    <p>Rating: ${product.rating.rate}</p>
+    <h3>Price: $ ${product.price}</h3>
+    <button onclick="addToCart(${product.id},${product.price})" id="addToCart-btn" class="buy-now btn btn-secondary">add to cart</button>
+    <button onclick="loadASingleProduct(${product.id})" id="details-btn" class="btn btn-primary">Details</button></div>
+    `;
     document.getElementById("all-products").appendChild(div);
   }
 };
@@ -37,7 +40,10 @@ const addToCart = (id, price) => {
   count = count + 1;
   updatePrice("price", price);
 
+  // the function invoked to update delivery charge and total Tax
   updateTaxAndCharge();
+
+  // update (increase) the number of products added to the cart
   document.getElementById("total-Products").innerText = count;
 
   // to calculate the total, updateTotal function is invoked
@@ -48,6 +54,7 @@ const getInputValue = (id) => {
   const element = document.getElementById(id).innerText;
   // instead of the parseInt method, the parseFloat method is used to get the accurate calculation.
   const converted = parseFloat(element);
+
   return converted;
 };
 
@@ -72,10 +79,12 @@ const updateTaxAndCharge = () => {
     setInnerText("delivery-charge", 30);
     setInnerText("total-tax", priceConverted * 0.2);
   }
+
   if (priceConverted > 400) {
     setInnerText("delivery-charge", 50);
     setInnerText("total-tax", priceConverted * 0.3);
   }
+
   if (priceConverted > 500) {
     setInnerText("delivery-charge", 60);
     setInnerText("total-tax", priceConverted * 0.4);
@@ -88,4 +97,27 @@ const updateTotal = () => {
     getInputValue("price") + getInputValue("delivery-charge") +
     getInputValue("total-tax");
   document.getElementById("total").innerText = grandTotal;
+};
+
+// load a single product when the details button is clicked
+const loadASingleProduct = (productId) => {
+  // get the api data for a single product
+  fetch(`https://fakestoreapi.com/products/${productId}`)
+    .then(res => res.json())
+    .then(data => displayASingleProduct(data));
+};
+
+// display a single product to UI when the details button is clicked
+const displayASingleProduct = (aProduct) => {
+  const singleProductContainer = document.getElementById('single-product');
+  singleProductContainer.style.display = 'block';
+
+  singleProductContainer.innerHTML = `
+  <img src="${aProduct.image}" width="150" class="mb-3"></img>
+  <h3>${aProduct.title}</h3>
+  <span>Category: ${aProduct.category}</span><br>
+  <span>Reactions count: ${aProduct.rating.count}</span><br>
+  <span>Rating: ${aProduct.rating.rate}</span>
+  <h4 class="mt-2">Price: $ ${aProduct.price}</h4>
+  `;
 };
