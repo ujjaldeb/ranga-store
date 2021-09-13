@@ -1,16 +1,21 @@
 const loadProducts = () => {
   const url = `https://fakestoreapi.com/products`;
+
+  // Get the api data
   fetch(url)
     .then((response) => response.json())
     .then((data) => showProducts(data));
 };
+
 loadProducts();
 
 // show all product in UI 
 const showProducts = (products) => {
   const allProducts = products.map((pd) => pd);
+
   for (const product of allProducts) {
-    const image = product.images;
+    // It will be image in place of images (Fixed)
+    const image = product.image;
     const div = document.createElement("div");
     div.classList.add("product");
     div.innerHTML = `<div class="single-product">
@@ -26,6 +31,7 @@ const showProducts = (products) => {
     document.getElementById("all-products").appendChild(div);
   }
 };
+
 let count = 0;
 const addToCart = (id, price) => {
   count = count + 1;
@@ -33,11 +39,15 @@ const addToCart = (id, price) => {
 
   updateTaxAndCharge();
   document.getElementById("total-Products").innerText = count;
+
+  // to calculate the total, updateTotal function is invoked
+  updateTotal();
 };
 
 const getInputValue = (id) => {
   const element = document.getElementById(id).innerText;
-  const converted = parseInt(element);
+  // instead of the parseInt method, the parseFloat method is used to get the accurate calculation.
+  const converted = parseFloat(element);
   return converted;
 };
 
@@ -46,7 +56,8 @@ const updatePrice = (id, value) => {
   const convertedOldPrice = getInputValue(id);
   const convertPrice = parseFloat(value);
   const total = convertedOldPrice + convertPrice;
-  document.getElementById(id).innerText = Math.round(total);
+  // instead of the Math.round(), the toFixed method is used. Fixed
+  document.getElementById(id).innerText = total.toFixed(2);
 };
 
 // set innerText function
